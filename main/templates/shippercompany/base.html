@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html
+  lang="en"
+  class="light-style customizer-hide" dir="ltr" 
+  data-theme="theme-default" data-assets-path="{% static '/assets/' %}" data-template="vertical-menu-template-free">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"/>
+
+    {% include 'shippercompany/blocks/links.html' %}
+
+    <title>{% block page_title %}{% endblock page_title %}</title>
+
+    <meta name="description" content=""/>
+  </head>
+
+  {% block custom_css %}  
+
+    
+  {% endblock custom_css %}
+
+  <body>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <!-- Menu -->
+          {% include 'shippercompany/blocks/sidebar.html' %}
+
+          <!-- ======= Header ======= -->
+          <!-- Layout container -->
+        <div class="layout-page">
+          <!-- Navbar -->
+
+          {% include 'shippercompany/blocks/header.html' %}
+          <!-- End Header -->
+
+          {% block content %} {% endblock %}
+
+          <!-- ======= Footer ======= -->
+          {% include 'shippercompany/blocks/footer.html' %}
+          <!-- End Footer -->
+
+            </div>
+          </div>
+
+    {% include 'shippercompany/blocks/scripts.html' %}
+
+    {% block custom_js%}{% endblock custom_js%}
+
+  </body>
+</html>
