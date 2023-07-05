@@ -45,15 +45,15 @@
             <div class="row mb-3">
                 <label for="{{ form.cargo.id_for_label }}" class="col-sm-2 col-form-label">Cargo:</label>
                 <div class="col-sm-10">
-                    <select class="form-select">{{ form.cargo.value }}</select>
+                    {{ form.cargo }}
                     {{ form.cargo.errors }}
                 </div>
               </div>
 
-          <div class="row mb-3">
-            <label class="col-sm-2 col-form-label" for="basic-default-company">Company</label>
-            <div class="col-sm-10">
-              <input type="text" class="form-control" id="basic-default-company" placeholder="ACME Inc.">
+          <div class="mb-3 row">
+            <label for="html5-datetime-local-input" class="col-md-2 col-form-label">Departure Date</label>
+            <div class="col-md-10">
+              <input class="form-control" type="datetime-local" value="2021-06-18T12:30:00" id="html5-datetime-local-input">
             </div>
           </div>
           <div class="row mb-3">
