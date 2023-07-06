@@ -64,7 +64,7 @@ class OrderForm(forms.ModelForm):
         fields = ['cargo', 'status', 'departureDate', 
                   'departureCity', 'departureAddress', 'destinationDate',
                   'destinationCity', 'destinationAddress', 'description', 
-                  'reiting', 'company', 'isDengerouse']
+                  'reiting', 'carrier_company', 'shipper_company', 'isDengerouse']
         
         cargo = forms.ModelChoiceField(queryset=Cargo.objects.all(), 
                                      widget=forms.Select(attrs={"class": "form-select", 'required': True, "id" : "cargo"},
@@ -98,7 +98,51 @@ class OrderForm(forms.ModelForm):
 
         )
         reiting = forms.FloatField(widget=forms.widgets.NumberInput(attrs={"class": "form-control", 'required': True, 'step': 0.1, 'max': 5.0, 'min': 0.0, 'id': 'reiting'}))
-        company = forms.ModelChoiceField(queryset=CarrierCompany.objects.all(), 
+        carrier_company = forms.ModelChoiceField(queryset=CarrierCompany.objects.all(), 
+                                     widget=forms.Select(attrs={"class": "form-control", 'required': True, "id" : "company"},
+            ))
+        shipper_company = forms.ModelChoiceField(queryset=ShipperCompany.objects.all(), 
                                      widget=forms.Select(attrs={"class": "form-control", 'required': True, "id" : "company"},
             ))
         isDengerouse = forms.BooleanField(widget=forms.widgets.RadioSelect(attrs={"class": "form-control", 'required': True, 'default':'False'}))
+
+class BoxForm(forms.ModelForm):
+    class Meta:
+        model = Box
+        fields = ['count', 'length', 'width', 
+                  'height', 'weight']
+        
+        count = forms.FloatField(widget=forms.widgets.NumberInput(attrs={'class':'form-control', 'step': 0.0, 'max': 10000, 'min': 0.0, 'id':'count'}))
+        length = forms.FloatField(widget=forms.widgets.NumberInput(attrs={'class':'form-control', 'step': 0.0, 'max': 10000, 'min': 0.0}))
+        width = forms.FloatField(widget=forms.widgets.NumberInput(attrs={'class':'form-control', 'step': 0.0, 'max': 10000, 'min': 0.0}))
+        height = forms.FloatField(widget=forms.widgets.NumberInput(attrs={'class':'form-control', 'step': 0.0, 'max': 10000, 'min': 0.0}))
+        weight = forms.FloatField(widget=forms.widgets.NumberInput(attrs={'class':'form-control', 'step': 0.0, 'max': 10000, 'min': 0.0}))
+
+class ContainerForm(forms.ModelForm):
+    class Meta:
+        model = Container
+        fields = ['count', 'type', 'cargoWeight', 
+                  'contanerWeight', 'totalWeight']
+        
+        count = forms.FloatField(widget=forms.widgets.NumberInput(attrs={'class':'form-control', 'step': 0.0, 'max': 10000, 'min': 0.0}))
+        type = forms.CharField(max_length=50,
+                                    widget= forms.Select(
+                                            attrs={"class" : "form-control", "id" : "type_of_acid"},
+                                            choices=ContainerType.choices
+                                        )
+                                )
+        cargoWeight = forms.FloatField(widget=forms.widgets.NumberInput(attrs={'class':'form-control', 'step': 0.0, 'max': 10000, 'min': 0.0}))
+        contanerWeight = forms.FloatField(widget=forms.widgets.NumberInput(attrs={'class':'form-control', 'step': 0.0, 'max': 10000, 'min': 0.0}))
+        totalWeight = forms.FloatField(widget=forms.widgets.NumberInput(attrs={'class':'form-control', 'step': 0.0, 'max': 10000, 'min': 0.0}))
+
+class Cargo(forms.ModelForm):
+    class Meta:
+        model = Cargo
+        fields = ['container', 'box']
+        
+    container = forms.ModelChoiceField(queryset=Container.objects.all(), 
+                                     widget=forms.Select(attrs={"class": "form-select", 'required': True, "id" : "container"},
+            ))
+    box = forms.ModelChoiceField(queryset=Box.objects.all(), 
+                                     widget=forms.Select(attrs={"class": "form-select", 'required': True, "id" : "box"},
+            ))

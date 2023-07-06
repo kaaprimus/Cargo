@@ -1,0 +1,66 @@
+{% extends 'carriercompany/base.html' %}
+{% load static %} 
+
+{% block page_title %}Chats{% endblock page_title %}
+
+{% block content %}
+<div class="m-5 mb-0">
+    <div class="page-header">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'carriercompany' %}">Home</a></li>
+                <li class="breadcrumb-item"><a>Chats</a></li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="ml-5">
+    {% if messages %} 
+        {% for message in messages %}
+            {% if message.tags == "error" %}
+                <div class="alert alert-danger alert-dismissible" id="message" role="alert">{{message}}
+                    <button type="button" class="btn" onclick="closeMessage()">
+                        <i class='bx bxs-x-square'></i>
+                    </button>
+                </div>
+            {% elif message.tags == "success" %}
+            <div class="alert alert-success alert-dismissible" id="message" role="alert">{{message}}
+                <button type="button" class="btn" onclick="closeMessage()">
+                    <i class='bx bxs-x-square'></i>
+                </button>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div class="m-5 mt-0 d-flex">
+    {% for room in rooms %}
+    <div class="row mb-5 col-md-6 m-1">
+        <a href="{% url 'room' room.slug %}">
+            <div class="col-md">
+            <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-2">
+                            <img class="card-img card-img-left" src="{% static '/assets/img/elements/12.jpg' %}" alt="Card image">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{room.name}}</h5>
+                                <p class="card-text">
+                                    
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+    <!-- / Content -->
+    
+{% endblock %}

@@ -97,8 +97,24 @@ class Order(models.Model):
     destinationAddress = models.CharField(verbose_name="Адрес доставки", max_length=85)
     description = models.TextField(verbose_name="Описание")
     reiting = models.FloatField(verbose_name="Рейтинг", null=True)
-    company = models.ForeignKey(CarrierCompany, on_delete=models.RESTRICT, null=True)
+    carrier_company = models.ForeignKey(CarrierCompany, on_delete=models.RESTRICT, null=True)
+    shipper_company = models.ForeignKey(ShipperCompany, on_delete=models.RESTRICT, null=True)
     isDengerouse = models.BooleanField(default=False)
+
+class Room(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class Message(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    user = models.CharField(max_length=100)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user}: {self.content}'
 
 
 

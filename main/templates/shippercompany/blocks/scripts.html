@@ -29,3 +29,22 @@
           }
 
     </script>
+
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          var formData = new FormData(this);
+          fetch(this.action, {
+            method: this.method,
+            body: formData
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Success:', data)
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+        });
+      </script>

@@ -2,8 +2,26 @@
 {% load static %}
 {% block content %}
 
-{% url 'order_create' as url_path %}
+{% url 'createorder' as url_path %}
 {% url 'orders_all' as orders_all %}
+
+{% if messages %} 
+{% for message in messages %}
+    {% if message.tags == "error" %}
+        <div class="alert alert-danger alert-dismissible" id="message" role="alert">{{message}}
+            <button type="button" class="btn" onclick="closeMessage()">
+                <i class='bx bxs-x-square'></i>
+            </button>
+        </div>
+    {% elif message.tags == "success" %}
+    <div class="alert alert-success alert-dismissible" id="message" role="alert">{{message}}
+        <button type="button" class="btn" onclick="closeMessage()">
+            <i class='bx bxs-x-square'></i>
+        </button>
+    </div>
+    {% endif %}
+{% endfor %}
+{% endif %}
 
 <div class="m-5">
     <div class="page-header">
@@ -11,84 +29,51 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="{% url 'shippercompany' %}">Главная</a></li>
           <li class="breadcrumb-item"><a href="{{orders_all}}">Заказы</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{% if request.path == url_path %}Добавление{% else %}Обновление {% endif %}</li>
+          <li class="breadcrumb-item active" aria-current="page">{% if request.path == url_path %}Create order{% else %}Update order {% endif %}</li>
         </ol>
       </nav>
     </div>
 
-    {% if messages %} 
-        {% for message in messages %}
-            {% if message.tags == "error" %}
-                <div class="alert alert-danger alert-dismissible" id="message" role="alert">{{message}}
-                    <button type="button" class="btn" onclick="closeMessage()">
-                        <i class='bx bxs-x-square'></i>
-                    </button>
-                </div>
-            {% elif message.tags == "success" %}
-            <div class="alert alert-success alert-dismissible" id="message" role="alert">{{message}}
-                <button type="button" class="btn" onclick="closeMessage()">
-                    <i class='bx bxs-x-square'></i>
-                </button>
-            </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-
-<div class="col-xxl">
-    <div class="card mb-4">
-      <div class="card-header d-flex align-items-center justify-content-between">
-        <h5 class="mb-0">{% if request.path == url_path %}Create order{% else %}Update{% endif %}</h5> <small class="text-muted float-end"></small>
-      </div>
-      <div class="card-body">
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="row mb-3">
-                <label for="{{ form.cargo.id_for_label }}" class="col-sm-2 col-form-label">Cargo:</label>
-                <div class="col-sm-10">
-                    {{ form.cargo }}
-                    {{ form.cargo.errors }}
-                </div>
-              </div>
-
-          <div class="mb-3 row">
-            <label for="html5-datetime-local-input" class="col-md-2 col-form-label">Departure Date</label>
-            <div class="col-md-10">
-              <input class="form-control" type="datetime-local" value="2021-06-18T12:30:00" id="html5-datetime-local-input">
-            </div>
+    <div class="col-xl-12">
+      <h6 class="text-muted">Cargo form</h6>
+      <div class="nav-align-top mb-4">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item">
+            <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-box" aria-controls="navs-top-box" aria-selected="true">Box</button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-container" aria-controls="navs-top-container" aria-selected="false">Container</button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-order" aria-controls="navs-top-order" aria-selected="false">Order</button>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade active show" id="navs-top-box" role="tabpanel">
+            <form action="{% url 'createorder' %}" method="post">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <button type="submit" name="form1_submit">Отправить форму 1</button>
+            </form>
           </div>
-          <div class="row mb-3">
-            <label class="col-sm-2 col-form-label" for="basic-default-email">Email</label>
-            <div class="col-sm-10">
-              <div class="input-group input-group-merge">
-                <input type="text" id="basic-default-email" class="form-control" placeholder="john.doe" aria-label="john.doe" aria-describedby="basic-default-email2">
-                <span class="input-group-text" id="basic-default-email2">@example.com</span>
-              </div>
-              <div class="form-text"> You can use letters, numbers &amp; periods </div>
-            </div>
+          <div class="tab-pane fade" id="navs-top-container" role="tabpanel">
+            <form action="{% url 'createorder' %}" method="post">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <button type="submit" name="form2_submit">Отправить форму 2</button>
+            </form>
           </div>
-          <div class="row mb-3">
-            <label class="col-sm-2 col-form-label" for="basic-default-phone">Phone No</label>
-            <div class="col-sm-10">
-              <input type="text" id="basic-default-phone" class="form-control phone-mask" placeholder="658 799 8941" aria-label="658 799 8941" aria-describedby="basic-default-phone">
-            </div>
+          <div class="tab-pane fade" id="navs-top-order" role="tabpanel">
+            <form method="post" action="{% url 'createorder' %}">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <button type="submit" name="form3_submit">Отправить форму 3</button>
+            </form>
           </div>
-          <div class="row mb-3">
-            <label class="col-sm-2 col-form-label" for="basic-default-message">Message</label>
-            <div class="col-sm-10">
-              <textarea id="basic-default-message" class="form-control" placeholder="Hi, Do you have a moment to talk Joe?" aria-label="Hi, Do you have a moment to talk Joe?" aria-describedby="basic-icon-default-message2"></textarea>
-            </div>
-          </div>
-          <div class="row justify-content-end">
-            <div class="col-sm-10">
-                <button type="submit" class="btn btn-primary mr-2">Опубликовать</button>
-                <a href="{% url 'shippercompany' %}"  class="btn btn-light">Отменить</a>
-            </div>
-          </div>
-        </form>
+        </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
 
 {% endblock content %}

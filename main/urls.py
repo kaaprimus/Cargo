@@ -8,6 +8,7 @@ urlpatterns = [
     path('accounts/login/', views.index, name="login"),
     path('doLogin/', views.doLogin, name="doLogin"),
     path('logout/', views.logout_page, name='logout_user'),
+    path('search/suggestions/', views.search_suggestions, name='search_suggestions'),
 
     # Reset password
     path("accounts/password_reset/", views.password_reset_request, name="password_reset"),
@@ -20,9 +21,9 @@ urlpatterns = [
 
     #URL's for carriercompany
     path('carriercompany-home/', views.carriercompanypage, name="carriercompany"),
+    path('carriercompany/orders-list/', views.OrderListView.as_view(), name="orders_list"),
+
     #URL's for shippercompany
     path('shippercompany-home/', views.shippercompanypage, name="shippercompany"),
-    path('shippercompany/create-order/', views.OrderCreateView.as_view(), name="createorder"),
-
-
+    path('shippercompany/createorder/', views.OrderCreateView.as_view(), name='createorder')
 ]

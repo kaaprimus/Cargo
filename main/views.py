@@ -24,6 +24,9 @@ from django.core.mail import BadHeaderError, send_mail
 from django.http import HttpResponse
 from django.contrib.auth.views import PasswordChangeView
 from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage
+from django.shortcuts import render
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -51,7 +54,6 @@ def doLogin(request):
     if request.method != "POST":
         return redirect('login')
     else:
-        username = request.POST.get('email'),
         user = EmailBackEnd.authenticate(request, username=request.POST.get('email'), password=request.POST.get('password'))
         if user != None:
             login(request, user)
@@ -75,12 +77,38 @@ def logout_page(request):
     logout(request)
     cache.clear()
     return redirect('login')
-
-@never_cache     
+   
 @authentication_required
 @user_passes_test(is_carrier_company, login_url='login')
 def carriercompanypage(request):
-    return render(request, "carriercompany/index.html")
+    orders = Order.objects.filter(status="FREE")
+    paginator = Paginator(orders, 4)  # Number of orders per page
+    page_number = request.GET.get('page')
+
+    try:
+        page_obj = paginator.get_page(page_number)
+    except EmptyPage:
+        return redirect('?page={}'.format(paginator.num_pages))
+    
+    active_panel = "home-panel"
+    context = {
+        "is_active": active_panel,
+        "active_home": "active",
+        "expand_home": "show",
+        "orders": page_obj,
+    }
+    return render(request, "carriercompany/index.html", context)
+
+def perform_search(query):
+    results = Order.objects.filter(title__icontains=query)
+    return results
+
+def search_suggestions(request):
+    query = request.GET.get('query')
+    results = Order.objects.filter(shipper_company__companyname__icontains=query)[:5]
+    suggestions = [result.shipper_company.companyname for result in results]
+    return JsonResponse({'suggestions': suggestions})
+
 
 @never_cache     
 @authentication_required
@@ -156,27 +184,103 @@ def password_reset_request(request):
 class OrderView(View):
     model = Order
     form_class = OrderForm
+    box_form = BoxForm
+    container_form = ContainerForm
+
     active_panel = "orders-panel"
     login_url = "login_page"
     success_url = reverse_lazy("orders_create")
     extra_context = {
         "is_active" : active_panel,
-        "active_regions" : "active",
-        "expand_regions" : "show",
+        "active_orders" : "active",
+        "expand_orders" : "show",
         }
     
 class OrderListView(LoginRequiredMixin, OrderView, ListView):
-    template_name = "shippercompany/pages/order/orders_list.html"
-    paginate_by = 10
+    template_name = "carriercompany/pages/order/orders_list.html"
+    default_paginate_by = 10  # Default number of records per page
+    paginate_by_options = [10, 20, 50]
 
     def dispatch(self, request, *args, **kwargs):
-        if not is_shipper_company(request.user):
-            return user_passes_test(lambda u: is_shipper_company(u), login_url='login')(super().dispatch)(request, *args, **kwargs)
+        if not is_carrier_company(request.user):
+            return user_passes_test(lambda u: is_carrier_company(u), login_url='login')(super().dispatch)(request, *args, **kwargs)
         return super().dispatch(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        return Order.objects.filter(status="FREE")  # Add any filters or conditions as needed
 
-class OrderCreateView(LoginRequiredMixin, SuccessMessageMixin, OrderView, CreateView):
+    def get_paginate_by(self, queryset):
+        paginate_by = self.request.GET.get('paginate_by', self.default_paginate_by)
+        if paginate_by is not None:
+            try:
+                paginate_by = int(paginate_by)
+                if paginate_by in self.paginate_by_options:
+                    return paginate_by
+            except (ValueError, TypeError):
+                pass
+        return self.default_paginate_by
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+        paginate_by = self.get_paginate_by(queryset)
+        paginator = Paginator(self.get_queryset(), paginate_by)
+        page_number = self.request.GET.get('page')
+        if page_number is None:
+            page_number = 1
+        page_obj = paginator.get_page(page_number)
+        context['page_obj'] = page_obj
+        context['paginate_by_options'] = self.paginate_by_options
+        context['current_paginate_by'] = self.get_paginate_by(self.get_queryset())
+        return context
+
+def wizard_view(request):
+        if request.method == 'POST':
+            step = int(request.POST.get('step', 1))
+            if step == 1:
+                form = BoxForm(request.POST)
+                if form.is_valid():
+                    # Обработка данных формы Step 1
+                    # Переход к следующему шагу
+                    return redirect('wizard_view')
+            elif step == 2:
+                form = ContainerForm(request.POST)
+                if form.is_valid():
+                    # Обработка данных формы Step 2
+                    # Переход к следующему шагу
+                    return redirect('wizard_view')
+            elif step == 3:
+                form = OrderForm(request.POST)
+                if form.is_valid():
+                    # Обработка данных формы Step 3
+                    # Завершение визарда
+                    return redirect('success_view')
+        else:
+            step = int(request.GET.get('step', 1))
+        
+        if step == 1:
+            form = BoxForm()
+        elif step == 2:
+            form = ContainerForm()
+        elif step == 3:
+            form = OrderForm()
+        
+        context = {
+            'form': form,
+            'step': step,
+        }
+        return render(request, 'shippercompany/pages/order/order_form.html', context)
+
+
+class OrderCreateView(LoginRequiredMixin, SuccessMessageMixin, OrderView, View):
     template_name = 'shippercompany/pages/order/order_form.html'
-    success_message = "Запись успешно Добавлена!"
+    success_message = "Запись успешно добавлена!"
+
+    def get(self, request):
+        return wizard_view(request)
+
+    def post(self, request):
+        return wizard_view(request)
 
     def dispatch(self, request, *args, **kwargs):
         if not is_shipper_company(request.user):

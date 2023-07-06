@@ -1,0 +1,112 @@
+{% extends 'carriercompany/base.html' %}
+{% load static %}
+
+{% block page_title %}Orders{% endblock page_title %}
+
+{% block content %}
+      
+<div class="m-5 mt-3">
+    <div class="page-header">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'carriercompany' %}">Home</a></li>
+          <li class="breadcrumb-item"><a>Orders</a></li>
+          
+        </ol>
+      </nav>
+    </div>
+
+    <div class="mb-3 col-md-2 d-flex">
+        <label class="col-sm-3 col-form-label" for="basic-default-company">Show</label>
+        <select id="paginate_by_dropdown" class="form-select">
+            {% for option in paginate_by_options %}
+                <option value="{{ option }}" {% if option == current_paginate_by %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+        <label class="col-form-label" for="basic-default-company"> entries</label>
+    </div>
+
+    {% if messages %} 
+        {% for message in messages %}
+            {% if message.tags == "error" %}
+                <div class="alert alert-danger alert-dismissible" id="message" role="alert">{{message}}
+                    <button type="button" class="btn" onclick="closeMessage()">
+                        <i class='bx bxs-x-square'></i>
+                    </button>
+                </div>
+            {% elif message.tags == "success" %}
+            <div class="alert alert-success alert-dismissible" id="message" role="alert">{{message}}
+                <button type="button" class="btn" onclick="closeMessage()">
+                    <i class='bx bxs-x-square'></i>
+                </button>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <div class="row mb-5 mt-0 d-flex">
+        {% for value in page_obj %}
+        <div class="col-md col-md-6">
+          <div class="card mb-3">
+            <div class="row g-0">
+              <div class="col-md-4">
+                <img class="card-img card-img-left" src="{% static '/assets/img/elements/12.jpg' %}" alt="Card image">
+                <button class="btn btn-primary m-5 mt-2 mb-0">Respond</button>
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">{{value.shipper_company.companyname}}</h5>
+                  <p class="card-text">
+                    {{value.description}}
+                  </p>
+                  <p class="card-text"><small><b>Departure date:</b></small> <small class="text-muted">{{value.departureDate}}</small></p>
+                  <p class="card-text"><small><b>Destination date:</b></small> <small class="text-muted">{{value.destinationDate}}</small></p>
+                  <p class="card-text"><small><b>Departure city:</b></small> <small class="text-muted">{{value.departureCity}}</small></p>
+                  <p class="card-text"><small><b>Destination city:</b></small> <small class="text-muted">{{value.destinationCity}}</small></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item first">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="tf-icon bx bx-chevrons-left"></i></a>
+                    </li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</a>
+                </li>
+                {% if page_obj.has_next %}
+                    <li class="page-item last">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="tf-icon bx bx-chevrons-right"></i></a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        
+    </div>
+
+
+
+</div>
+
+
+{% endblock content %}
+
+{% block custom_js%}
+
+<script>
+    const paginateByDropdown = document.getElementById('paginate_by_dropdown');
+    paginateByDropdown.addEventListener('change', function() {
+        const selectedValue = this.value;
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('paginate_by', selectedValue);
+        window.location.href = currentUrl;
+    });
+</script>
+
+{% endblock custom_js %}

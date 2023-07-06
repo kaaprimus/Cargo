@@ -57,7 +57,7 @@
             </g>
           </svg>
         </span>
-        <span class="app-brand-text demo menu-text fw-bolder ms-2">Sneat</span>
+        <span class="app-brand-text demo menu-text fw-bolder ms-2">Cargo</span>
       </a>
 
       <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -69,10 +69,16 @@
 
     <ul class="menu-inner py-1">
       <!-- Dashboard -->
-      <li class="menu-item active">
+      <li class="menu-item {% if is_active == "home-panel" %}active{% endif %}">
         <a href="{% url 'carriercompany' %}" class="menu-link">
           <i class="menu-icon tf-icons bx bx-home-circle"></i>
           <div data-i18n="Analytics">Dashboard</div>
+        </a>
+      </li>
+      <li class="menu-item {% if expand_orders %}active{% endif %}">
+        <a href="{% url 'orders_list' %}" class="menu-link">
+          <i class="menu-icon tf-icons bx bxs-shopping-bag"></i>
+          <div data-i18n="Analytics">Orders</div>
         </a>
       </li>
 

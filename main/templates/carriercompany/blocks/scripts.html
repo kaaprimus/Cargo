@@ -21,6 +21,8 @@
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
 
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+
     <script>
 
         function closeMessage() {
@@ -29,3 +31,32 @@
           }
 
     </script>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchSuggestions = document.getElementById('search-suggestions');
+        console.log("Worked")
+        searchInput.addEventListener('input', function() {
+          const query = this.value;
+          if (query.length >= 3) {
+            const url = '/search/suggestions/?query=' + encodeURIComponent(query);
+            fetch(url)
+              .then(response => response.json())
+              .then(data => {
+                searchSuggestions.innerHTML = '';
+                data.suggestions.forEach(suggestion => {
+                    const suggestionItem = document.createElement('a');
+                    suggestionItem.textContent = suggestion;
+                    suggestionItem.classList.add('suggestion-item');
+                    suggestionItem.href = '/order-detail/' + encodeURIComponent(suggestion);
+                    searchSuggestions.appendChild(suggestionItem);
+                  });    
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+          } else {
+            searchSuggestions.innerHTML = '';
+          }
+        });
+      </script>
